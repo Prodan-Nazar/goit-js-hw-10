@@ -1,0 +1,86 @@
+<!-- index.html -->
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Promise Generator</title>
+  <!-- Підключення бібліотеки iziToast та її стилів -->
+  <script type="module" src="https://cdn.skypack.dev/izitoast@1.4.0"></script>
+  <link rel="stylesheet" href="https://cdn.skypack.dev/izitoast@1.4.0/dist/css/iziToast.min.css">
+</head>
+
+<body>
+  <!-- Форма для введення значення затримки та обрання стану промісу -->
+  <form class="form" id="promiseForm">
+    <label>
+      Delay (ms)
+      <input type="number" name="delay" required />
+    </label>
+
+    <fieldset>
+      <legend>State</legend>
+      <label>
+        <input type="radio" name="state" value="fulfilled" required />
+        Fulfilled
+      </label>
+      <label>
+        <input type="radio" name="state" value="rejected" required />
+        Rejected
+      </label>
+    </fieldset>
+
+    <button type="submit">Create notification</button>
+  </form>
+
+  <!-- Підключення скрипта -->
+  <script type="module">
+    // Імпорт бібліотеки iziToast
+    import iziToast from "https://cdn.skypack.dev/izitoast@1.4.0";
+
+    // Функція для виведення повідомлень за допомогою iziToast
+    function showToast(message, type) {
+      iziToast.show({
+        message: message,
+        position: "topRight",
+        color: type === "fulfilled" ? "green" : "red",
+      });
+    }
+
+    // Обробник події сабміту форми
+    document.getElementById("promiseForm").addEventListener("submit", function (event) {
+      event.preventDefault();
+
+      // Отримання значень з форми
+      const delay = parseInt(this.elements.delay.value);
+      const state = this.elements.state.value;
+
+      // Створення промісу
+      const promise = new Promise((resolve, reject) => {
+        // Виклик resolve/reject через задану кількість мілісекунд
+        setTimeout(() => {
+          if (state === "fulfilled") {
+            resolve(delay);
+          } else {
+            reject(delay);
+          }
+        }, delay);
+      });
+
+      // Обробка промісу
+      promise.then(
+        // Виконується при вдалому виконанні промісу
+        (result) => {
+          showToast(`✅ Fulfilled promise in ${result}ms`, "fulfilled");
+        },
+        // Виконується при невдалому виконанні промісу
+        (error) => {
+          showToast(`❌ Rejected promise in ${error}ms`, "rejected");
+        }
+      );
+    });
+  </script>
+</body>
+
+</html>
